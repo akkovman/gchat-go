@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"log"
 	"sync"
 )
 
@@ -41,8 +40,11 @@ func (h *Hub) broadcast(message []byte) {
 	defer h.mu.RUnlock()
 
 	for conn := range h.clients {
-		if err := conn.send(message); err != nil {
-			log.Printf("Broadcast error: %v", err)
+		select {
+		case conn.sendBuffer <- message:
+		default:
+			close(conn.sendBuffer)
+			delete(h.clients, conn)
 		}
 	}
 }

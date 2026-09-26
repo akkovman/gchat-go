@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -31,34 +30,14 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 	}
 
 	client := &Client{
-		hub:      h,
-		conn:     conn,
-		nickname: nickname,
+		hub:        h,
+		conn:       conn,
+		nickname:   nickname,
+		sendBuffer: make(chan []byte, 256),
 	}
 	h.addClient(client)
 	h.broadcast(encode("system", "", nickname+" is joined"))
 
-	defer func() {
-		h.deleteClient(client)
-		h.broadcast(encode("system", "", nickname+" is left"))
-
-		conn.Close()
-	}()
-
-	for {
-		_, raw, err := conn.ReadMessage()
-		if err != nil {
-			break
-		}
-
-		var in struct {
-			Type string `json:"type"`
-			Text string `json:"text"`
-		}
-		if json.Unmarshal(raw, &in) != nil || in.Type != "message" || in.Text == "" {
-			continue
-		}
-
-		h.broadcast(encode("message", nickname, in.Text))
-	}
+	go client.writePump()
+	go client.readPump()
 }
