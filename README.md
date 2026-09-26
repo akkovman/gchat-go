@@ -2,8 +2,8 @@
 
 **..that only requires a unique nickname**. Just follow the rules listed in this `README.md`
 
-[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/akkovman/gchat-go)]
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/akkovman/gchat-go/deploy.yml)]
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/akkovman/gchat-go)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/akkovman/gchat-go/deploy.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 ### Rules
