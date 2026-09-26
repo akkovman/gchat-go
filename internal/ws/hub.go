@@ -26,7 +26,11 @@ func (h *Hub) addClient(c *Client) {
 func (h *Hub) deleteClient(c *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	delete(h.clients, c)
+
+	if _, exists := h.clients[c]; exists {
+		delete(h.clients, c)
+		close(c.sendBuffer)
+	}
 }
 
 /*

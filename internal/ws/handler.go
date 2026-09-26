@@ -31,6 +31,7 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 	}
 
 	client := &Client{
+		hub:      h,
 		conn:     conn,
 		nickname: nickname,
 	}
