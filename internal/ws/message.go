@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+/*
+Abstract struct with json params for frontend
+*/
 type outMessage struct {
 	Type     string `json:"type"`
 	Nickname string `json:"nickname,omitempty"`

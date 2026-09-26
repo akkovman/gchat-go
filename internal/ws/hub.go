@@ -29,6 +29,9 @@ func (h *Hub) deleteClient(c *Client) {
 	delete(h.clients, c)
 }
 
+/*
+Send to everyone function
+*/
 func (h *Hub) broadcast(message []byte) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
