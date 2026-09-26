@@ -22,10 +22,7 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 		return
 	}
 
-	/*
-		TODO:
-		Add a unique nickname system later
-	*/
+	// TODO: Add a unique nickname system later
 
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
