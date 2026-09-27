@@ -21,6 +21,7 @@ import (
 // init is invoked before main()
 func init() {
 	// loads values from .env into the system
+	// in production use docker or k8s environment vars
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
 	}
@@ -39,7 +40,7 @@ func main() {
 	router.GET("/ws", hub.ServeWS)
 
 	srv := &http.Server{
-		Addr:    ":3000",
+		Addr:    env.GetEnv("IP_ADDRESS", ":3000"),
 		Handler: router.Handler(),
 	}
 

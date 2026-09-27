@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/json"
+	"gchat/internal/env"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -16,9 +17,11 @@ const (
 
 	// Send ping to peer with this period. Must be less than pongWait
 	pingPeriod = (pongWait * 9) / 10
+)
 
+var (
 	// Maximum message size allowed from peer
-	maxMessageSize = 4096
+	maxMessageSize = env.GetEnvAsInt("MAX_MESSAGE_SIZE", 4096)
 )
 
 /*
@@ -41,7 +44,7 @@ func (c *Client) readPump() {
 		c.conn.Close()
 	}()
 
-	c.conn.SetReadLimit(maxMessageSize)
+	c.conn.SetReadLimit(int64(maxMessageSize))
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 
