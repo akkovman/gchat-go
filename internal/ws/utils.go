@@ -2,11 +2,16 @@ package ws
 
 import "github.com/gorilla/websocket"
 
+const (
+	NicknameIsTaken = 4001
+	ServerIsFull    = 4002
+)
+
 /*
-Send to peer CloseMessage with close code 4001 (nickname is taken)
+Send to peer CloseMessage with close code
 */
-func rejectNicknameTaken(conn *websocket.Conn) {
-	payload := websocket.FormatCloseMessage(4001, "nickname taken")
+func sendCloseMessage(conn *websocket.Conn, code int, message string) {
+	payload := websocket.FormatCloseMessage(code, message)
 	conn.WriteMessage(websocket.CloseMessage, payload)
 	conn.Close()
 }
