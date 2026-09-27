@@ -19,11 +19,6 @@ const (
 	pingPeriod = (pongWait * 9) / 10
 )
 
-var (
-	// Maximum message size allowed from peer
-	maxMessageSize = env.GetEnvAsInt("MAX_MESSAGE_SIZE", 4096)
-)
-
 /*
 Abstract struct containing *websocket.Conn
 */
@@ -44,7 +39,7 @@ func (c *Client) readPump() {
 		c.conn.Close()
 	}()
 
-	c.conn.SetReadLimit(int64(maxMessageSize))
+	c.conn.SetReadLimit(int64(env.GetEnvAsInt("MAX_MESSAGE_SIZE", 4096)))
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 
