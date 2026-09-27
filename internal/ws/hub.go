@@ -44,13 +44,13 @@ func (h *Hub) deleteClient(c *Client) {
 /*
 Send to everyone function
 */
-func (h *Hub) broadcast(message []byte) {
+func (h *Hub) broadcast(outMsg outboundMessage) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
 	for conn := range h.clients {
 		select {
-		case conn.sendBuffer <- message:
+		case conn.sendBuffer <- outMsg:
 		default:
 			close(conn.sendBuffer)
 			delete(h.clients, conn)

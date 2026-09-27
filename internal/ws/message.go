@@ -22,3 +22,21 @@ func encode(msgType, nickname, text string) []byte {
 
 	return data
 }
+
+/*
+Enum types of message
+*/
+type outboundKind int
+
+const (
+	outboundText outboundKind = iota
+	outboundClose
+)
+
+/*
+Struct which contains type of message and data
+*/
+type outboundMessage struct {
+	kind outboundKind
+	data []byte
+}

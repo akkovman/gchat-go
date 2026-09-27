@@ -40,7 +40,7 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 		hub:        h,
 		conn:       conn,
 		nickname:   nickname,
-		sendBuffer: make(chan []byte, 256),
+		sendBuffer: make(chan outboundMessage, 256),
 	}
 
 	// Should check nickname uniqueness to avoid race condition too
@@ -49,7 +49,7 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 		return
 	}
 
-	h.broadcast(encode("system", "", nickname+" is joined"))
+	h.broadcast(outboundMessage{outboundText, encode("system", "", nickname+" is joined")})
 
 	go client.writePump()
 	go client.readPump()

@@ -28,7 +28,7 @@ type Client struct {
 	hub        *Hub
 	conn       *websocket.Conn
 	nickname   string
-	sendBuffer chan []byte // Buffered channel for i/o
+	sendBuffer chan outboundMessage // Buffered channel for i/o
 }
 
 /*
@@ -60,7 +60,7 @@ func (c *Client) readPump() {
 			continue
 		}
 
-		c.hub.broadcast(encode("message", c.nickname, in.Text))
+		c.hub.broadcast(outboundMessage{outboundText, encode("message", c.nickname, in.Text)})
 	}
 }
 
@@ -72,7 +72,7 @@ func (c *Client) writePump() {
 	defer func() {
 		ticker.Stop()
 
-		c.hub.broadcast(encode("system", "", c.nickname+" is left"))
+		c.hub.broadcast(outboundMessage{outboundText, encode("system", "", c.nickname+" is left")})
 		c.conn.Close()
 	}()
 
@@ -85,7 +85,13 @@ func (c *Client) writePump() {
 				return
 			}
 
-			if err := c.conn.WriteMessage(websocket.TextMessage, message); err != nil {
+			switch message.kind {
+			case outboundText:
+				if err := c.conn.WriteMessage(websocket.TextMessage, message.data); err != nil {
+					return
+				}
+			case outboundClose:
+				c.conn.WriteMessage(websocket.CloseMessage, message.data)
 				return
 			}
 		case <-ticker.C:
