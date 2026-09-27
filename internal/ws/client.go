@@ -2,7 +2,6 @@ package ws
 
 import (
 	"encoding/json"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -29,18 +28,7 @@ type Client struct {
 	hub        *Hub
 	conn       *websocket.Conn
 	nickname   string
-	writeMu    sync.Mutex
 	sendBuffer chan []byte // Buffered channel for i/o
-}
-
-/*
-Send to Client function
-*/
-func (c *Client) send(data []byte) error {
-	c.writeMu.Lock()
-	defer c.writeMu.Unlock()
-
-	return c.conn.WriteMessage(websocket.TextMessage, data)
 }
 
 /*
