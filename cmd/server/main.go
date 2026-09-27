@@ -9,11 +9,26 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
+
 	"github.com/gin-gonic/gin"
 
 	"gchat/internal"
+	"gchat/internal/env"
 	"gchat/internal/ws"
 )
+
+// init is invoked before main()
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+
+	if env.GetEnv("GIN_MODE", "debug") == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+}
 
 func main() {
 	hub := ws.NewHub()
