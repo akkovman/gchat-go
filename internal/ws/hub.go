@@ -63,7 +63,7 @@ func (h *Hub) broadcast(outMsg outboundMessage) {
 /*
 Close all websocket connections function
 */
-func (h *Hub) closeAll() {
+func (h *Hub) CloseAll() {
 	payload := websocket.FormatCloseMessage(1001, "Server is shutting down")
 	h.broadcast(outboundMessage{outboundClose, payload})
 }
