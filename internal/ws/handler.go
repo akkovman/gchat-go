@@ -21,17 +21,9 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: Add a unique nickname system later
-
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		log.Printf("Upgrade error: %v", err)
-		return
-	}
-
-	// If function is called, no needless RAM will be allocated
-	if h.isNicknameTaken(nickname) {
-		rejectNicknameTaken(conn)
 		return
 	}
 
@@ -43,10 +35,16 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 		sendBuffer: make(chan outboundMessage, 256),
 	}
 
-	// Should check nickname uniqueness to avoid race condition too
-	if !h.addClient(client) {
-		rejectNicknameTaken(conn)
-		return
+	ok, reason := h.addClient(client)
+	if !ok {
+		switch reason {
+		case int(ReasonNicknameIsTaken):
+			sendCloseMessage(conn, NicknameIsTaken, "nickname taken")
+			return
+		case int(ReasonServerIsFull):
+			sendCloseMessage(conn, ServerIsFull, "server full")
+			return
+		}
 	}
 
 	h.broadcast(outboundMessage{outboundText, encode("system", "", nickname+" is joined")})

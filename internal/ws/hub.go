@@ -1,13 +1,23 @@
 package ws
 
 import (
+	"gchat/internal/env"
 	"sync"
 
 	"github.com/gorilla/websocket"
 )
 
+type RejectReason int
+
+const (
+	ReasonNothing RejectReason = iota
+	ReasonNicknameIsTaken
+	ReasonServerIsFull
+)
+
 type Hub struct {
-	mu      sync.RWMutex
+	mu sync.RWMutex
+
 	clients map[*Client]bool
 }
 
@@ -17,20 +27,26 @@ func NewHub() *Hub {
 	}
 }
 
-func (h *Hub) addClient(c *Client) bool {
+func (h *Hub) addClient(c *Client) (bool, int) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	// BEGIN POLICY
 	for exists := range h.clients {
 		if exists.nickname == c.nickname {
-			return false
+			return false, int(ReasonNicknameIsTaken)
 		}
 	}
 	// END POLICY
 
+	// BEGIN SERVER FULL
+	if len(h.clients) >= env.GetEnvAsInt("MAX_CLIENT_CONNECTIONS", 1024) {
+		return false, int(ReasonServerIsFull)
+	}
+	// END SERVER FULL
+
 	h.clients[c] = true
-	return true
+	return true, int(ReasonNothing)
 }
 
 func (h *Hub) deleteClient(c *Client) {
