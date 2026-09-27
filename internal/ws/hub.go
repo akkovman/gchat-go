@@ -2,6 +2,8 @@ package ws
 
 import (
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type Hub struct {
@@ -56,4 +58,12 @@ func (h *Hub) broadcast(outMsg outboundMessage) {
 			delete(h.clients, conn)
 		}
 	}
+}
+
+/*
+Close all websocket connections function
+*/
+func (h *Hub) closeAll() {
+	payload := websocket.FormatCloseMessage(1001, "Server is shutting down")
+	h.broadcast(outboundMessage{outboundClose, payload})
 }
