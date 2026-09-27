@@ -29,13 +29,32 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 		return
 	}
 
+	// If function is called, no needless RAM will be allocated
+	if h.isNicknameTaken(nickname) {
+		payload := websocket.FormatCloseMessage(4001, "nickname taken")
+		conn.WriteMessage(websocket.CloseMessage, payload)
+		conn.Close()
+
+		return
+	}
+
+	// Calls before checking nickname uniqueness
 	client := &Client{
 		hub:        h,
 		conn:       conn,
 		nickname:   nickname,
 		sendBuffer: make(chan []byte, 256),
 	}
-	h.addClient(client)
+
+	// Should check nickname uniqueness to avoid race condition too
+	if !h.addClient(client) {
+		payload := websocket.FormatCloseMessage(4001, "nickname taken")
+		conn.WriteMessage(websocket.CloseMessage, payload)
+		conn.Close()
+
+		return
+	}
+
 	h.broadcast(encode("system", "", nickname+" is joined"))
 
 	go client.writePump()

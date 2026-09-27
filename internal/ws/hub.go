@@ -15,11 +15,20 @@ func NewHub() *Hub {
 	}
 }
 
-func (h *Hub) addClient(c *Client) {
+func (h *Hub) addClient(c *Client) bool {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	// BEGIN POLICY
+	for exists := range h.clients {
+		if exists.nickname == c.nickname {
+			return false
+		}
+	}
+	// END POLICY
+
 	h.clients[c] = true
+	return true
 }
 
 func (h *Hub) deleteClient(c *Client) {
