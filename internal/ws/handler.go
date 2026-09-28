@@ -8,11 +8,21 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// BEGIN CHECK ORIGIN
+
+// Enter the domains here
+var allowedOrigins = map[string]bool{
+	"http://localhost:3000": true, // For dev
+}
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		origin := r.Header.Get("Origin")
+		return allowedOrigins[origin]
 	},
 }
+
+// END CHECK OIRIGN
 
 func (h *Hub) ServeWS(ctx *gin.Context) {
 	nickname := ctx.Query("nickname")
