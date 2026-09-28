@@ -2,7 +2,6 @@ package ws
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -10,16 +9,9 @@ import (
 
 // BEGIN CHECK ORIGIN
 
-// Enter the domains here
-var allowedOrigins = map[string]bool{
-	"http://localhost:3000": true, // For dev
-}
-
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		origin := r.Header.Get("Origin")
-		return allowedOrigins[origin]
-	},
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
 // END CHECK OIRIGN
