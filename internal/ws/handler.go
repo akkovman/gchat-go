@@ -16,14 +16,15 @@ var upgrader = websocket.Upgrader{
 
 func (h *Hub) ServeWS(ctx *gin.Context) {
 	nickname := ctx.Query("nickname")
-	if nickname == "" {
-		ctx.String(http.StatusBadRequest, "Nickname is required")
-		return
-	}
 
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		log.Printf("Upgrade error: %v", err)
+		return
+	}
+
+	if !isValidNickname(nickname) {
+		sendCloseMessage(conn, InvalidNickname, "invalid nickname")
 		return
 	}
 
