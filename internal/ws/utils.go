@@ -1,10 +1,15 @@
 package ws
 
-import "github.com/gorilla/websocket"
+import (
+	"regexp"
+
+	"github.com/gorilla/websocket"
+)
 
 const (
 	NicknameIsTaken = 4001
 	ServerIsFull    = 4002
+	InvalidNickname = 4003
 )
 
 /*
@@ -15,3 +20,20 @@ func sendCloseMessage(conn *websocket.Conn, code int, message string) {
 	conn.WriteMessage(websocket.CloseMessage, payload)
 	conn.Close()
 }
+
+// BEGIN VALIDATOR
+
+/*
+Only latin characters, numbers and underscores are allowed
+3 to 20 characters
+*/
+var nicknameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]{3,20}$`)
+
+/*
+Function validate nickname
+*/
+func isValidNickname(nickname string) bool {
+	return nicknameRegex.MatchString(nickname)
+}
+
+// END VALIDATOR
