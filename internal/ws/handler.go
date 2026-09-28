@@ -52,6 +52,7 @@ func (h *Hub) ServeWS(ctx *gin.Context) {
 
 	h.broadcast(outboundMessage{outboundText, encode("system", "", nickname+" is joined")})
 
+	h.WG.Add(2)
 	go client.writePump()
 	go client.readPump()
 }

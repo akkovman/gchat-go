@@ -61,13 +61,15 @@ func main() {
 	<-quit
 	log.Println("Shutdown Server ...")
 
-	hub.CloseAll()
-	log.Println("Closing active Websocket connections...")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Println("Server Shutdown:", err)
 	}
+
+	hub.CloseAll()
+	log.Println("Closing active Websocket connections...")
+	hub.WG.Wait()
+
 	log.Println("Server exiting")
 }

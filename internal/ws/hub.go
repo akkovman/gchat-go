@@ -19,6 +19,7 @@ type Hub struct {
 	mu sync.RWMutex
 
 	clients map[*Client]bool
+	WG      sync.WaitGroup
 }
 
 func NewHub() *Hub {

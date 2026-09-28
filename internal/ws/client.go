@@ -35,6 +35,8 @@ Runs in a goroutine
 */
 func (c *Client) readPump() {
 	defer func() {
+		c.hub.WG.Done()
+
 		c.hub.deleteClient(c)
 		c.conn.Close()
 	}()
@@ -69,6 +71,8 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
+
+		c.hub.WG.Done()
 
 		c.hub.broadcast(outboundMessage{outboundText, encode("system", "", c.nickname+" is left")})
 		c.conn.Close()
