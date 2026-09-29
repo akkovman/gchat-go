@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -15,6 +17,7 @@ import (
 
 	"gchat/internal"
 	"gchat/internal/env"
+	"gchat/internal/ip"
 	"gchat/internal/ws"
 )
 
@@ -32,7 +35,8 @@ func init() {
 }
 
 func main() {
-	hub := ws.NewHub()
+	banlist := ip.NewBanList()
+	hub := ws.NewHub(banlist)
 	router := gin.Default()
 
 	internal.ServeStatic(router)
@@ -48,6 +52,45 @@ func main() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	scanner := bufio.NewScanner(os.Stdin)
+	go func() {
+		for scanner.Scan() {
+			args := strings.Fields(scanner.Text())
+
+			if len(args) == 0 {
+				return
+			}
+
+			cmd := args[0]
+			switch cmd {
+			case "block":
+				if len(args) < 2 {
+					log.Println("No IP address")
+					continue
+				}
+
+				ip := args[1]
+				hub.BanList.Block(ip)
+				log.Printf("IP %s is blocked/n", ip)
+			case "unblock":
+				if len(args) < 2 {
+					log.Println("No IP address")
+					continue
+				}
+
+				ip := args[1]
+				hub.BanList.Unblock(ip)
+				log.Printf("IP %s is unblocked/n", ip)
+			default:
+				log.Println("Unknown command")
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			log.Printf("Scanner error: %v/n", err)
 		}
 	}()
 
