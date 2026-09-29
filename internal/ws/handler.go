@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"gchat/internal/ip"
 	"log"
 	"net/http"
 
@@ -22,7 +21,7 @@ var upgrader = websocket.Upgrader{
 func (h *Hub) ServeWS(ctx *gin.Context) {
 	nickname := ctx.Query("nickname")
 
-	ip := ip.GetClientAddress(ctx.Request)
+	ip := ctx.ClientIP()
 	if h.BanList.Check(ip) {
 		ctx.AbortWithStatus(http.StatusForbidden)
 		return
