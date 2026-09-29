@@ -9,6 +9,7 @@ import (
 
 // BEGIN CHECK ORIGIN
 
+// Check origin should through nginx proxy
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
