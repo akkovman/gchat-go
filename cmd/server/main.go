@@ -38,6 +38,7 @@ func main() {
 	banlist := ip.NewBanList()
 	hub := ws.NewHub(banlist)
 	router := gin.Default()
+	router.SetTrustedProxies([]string{env.GetEnv("TRUSTED_SUBNET", "172.18.0.0/16")})
 
 	internal.ServeStatic(router)
 
