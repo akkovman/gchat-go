@@ -2,6 +2,7 @@ package ws
 
 import (
 	"gchat/internal/env"
+	"gchat/internal/ip"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -20,11 +21,14 @@ type Hub struct {
 
 	clients map[*Client]bool
 	WG      sync.WaitGroup
+
+	BanList *ip.BanList
 }
 
-func NewHub() *Hub {
+func NewHub(bl *ip.BanList) *Hub {
 	return &Hub{
 		clients: make(map[*Client]bool),
+		BanList: bl,
 	}
 }
 
