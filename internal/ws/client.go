@@ -72,6 +72,9 @@ func (c *Client) readPump() {
 		}
 
 		c.hub.broadcast(outboundMessage{outboundText, encode("message", c.nickname, in.Text)})
+
+		// TODO: make good slow mode
+		time.Sleep(3 * time.Second) // hardcode slowmode
 	}
 }
 
