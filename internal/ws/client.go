@@ -2,8 +2,10 @@ package ws
 
 import (
 	"encoding/json"
+	"fmt"
 	"gchat/internal/env"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gorilla/websocket"
 )
@@ -57,6 +59,15 @@ func (c *Client) readPump() {
 		}
 
 		if json.Unmarshal(raw, &in) != nil || in.Type != "message" || in.Text == "" {
+			continue
+		}
+
+		// Counts logical number of characters
+		maxCharacters := env.GetEnvAsInt("MAX_CHARACTERS", 512)
+		if utf8.RuneCountInString(in.Text) > maxCharacters {
+			c.sendBuffer <- outboundMessage{
+				outboundText, encode("system", c.nickname, fmt.Sprintf("Message too long (%d maximum)", maxCharacters)),
+			}
 			continue
 		}
 
