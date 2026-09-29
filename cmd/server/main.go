@@ -75,7 +75,7 @@ func main() {
 
 				ip := args[1]
 				hub.BanList.Block(ip)
-				log.Printf("IP %s is blocked/n", ip)
+				log.Printf("IP %s is blocked", ip)
 			case "unblock":
 				if len(args) < 2 {
 					log.Println("No IP address")
@@ -84,14 +84,14 @@ func main() {
 
 				ip := args[1]
 				hub.BanList.Unblock(ip)
-				log.Printf("IP %s is unblocked/n", ip)
+				log.Printf("IP %s is unblocked", ip)
 			default:
 				log.Println("Unknown command")
 			}
 		}
 
 		if err := scanner.Err(); err != nil {
-			log.Printf("Scanner error: %v/n", err)
+			log.Printf("Scanner error: %v", err)
 		}
 	}()
 
