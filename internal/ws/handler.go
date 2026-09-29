@@ -1,7 +1,9 @@
 package ws
 
 import (
+	"gchat/internal/ip"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -19,6 +21,12 @@ var upgrader = websocket.Upgrader{
 
 func (h *Hub) ServeWS(ctx *gin.Context) {
 	nickname := ctx.Query("nickname")
+
+	ip := ip.GetClientAddress(ctx.Request)
+	if h.BanList.Check(ip) {
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
 
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
